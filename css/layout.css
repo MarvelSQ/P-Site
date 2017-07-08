@@ -1,0 +1,133 @@
+@font-face {
+    font-family: DINCondensed;
+    src: url('../font/din-bold.otf');
+}
+
+html, body {
+    height: 100%;
+}
+
+html, body, p, a, div {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    text-decoration: none;
+    position: relative;
+    /*font-family: "Helvetica Neue", serif;*/
+    font-family: DINCondensed, sans-serif;
+    color: #212121;
+}
+
+@media screen and (min-width: 532px) {
+    .container {
+        max-width: 1000px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .container > * {
+        width: 500px;
+        margin-right: auto;
+        margin-left: auto;
+    }
+
+    .content,.tip{
+        justify-content: space-between;
+    }
+
+    .content > .cell4 {
+        /*display: inline-block;*/
+        width: 25%;
+    }
+
+    /*.tip{*/
+        /*justify-content: space-around;*/
+    /*}*/
+
+    /*.content > .cell4 {*/
+        /*margin-right: 30px;*/
+    /*}*/
+
+    /*.content > .cell4 {*/
+        /*margin-right: 0;*/
+    /*}*/
+
+    .split {
+        justify-content: space-between;
+    }
+}
+
+@media screen and (max-width: 531px) {
+
+    .content{
+        flex-direction: column;
+    }
+
+    .container {
+        margin-right: 16px;
+        margin-left: 16px;
+    }
+
+    .split {
+        justify-content: center;
+        margin-bottom: 30px;
+    }
+
+    .tip{
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-height: 400px) {
+    .container > nav > img {
+        margin: 20px 0 20px 0;
+    }
+}
+
+@media screen and (max-height: 800px)and (min-height: 400px) {
+    .container > nav > img {
+        margin: 40px 0 60px 0;
+    }
+}
+
+@media screen and (min-height: 800px) {
+    .container > nav > img {
+        margin: 5vh 0 60px 0;
+    }
+}
+
+.container {
+    min-height: 100%;
+    background-color: #fff;
+    padding-bottom: 100px;
+    /*border-left: 20px solid transparent;*/
+    /*border-right: 20px dotted #FE3824;*/
+}
+
+.container > nav > img {
+    max-width: 99%;
+}
+
+.container > * {
+    text-align: center;
+}
+
+.split,.tip,.content{
+    display: flex;
+    display: -webkit-flex;
+}
+
+.container > .tip {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    margin-bottom: 40px;
+    /*margin-left:auto;*/
+    /*margin-right: auto;*/
+}
+
+
+.email-link{
+    font-family: sans-serif;
+    font-weight: 300;
+}

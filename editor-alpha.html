@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Editor</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+    <link rel="shortcut icon" href="img/logo-20*17.png">
+    <style>
+        html, body, div, ul, p, pre, textarea, a {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica Neue", serif;
+            border: none;
+            box-sizing: border-box;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        html, body {
+            height: 100%;
+            background-color: #efefef;
+        }
+
+        ul, li {
+            list-style: none;
+        }
+    </style>
+    <style>
+        .editor {
+            position: relative;
+            width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 100%;
+            box-shadow: 0 0 8px #555555;
+            background-color: #fff;
+        }
+
+        .editor.toolbar-high > .editor-layout, .editor.toolbar-high > .editor-doc {
+            padding-bottom: 100px;
+        }
+
+        .editor-layout, .editor-doc {
+            /*position: absolute;*/
+        }
+
+        .editor div.editor-layout {
+            /*top:0;*/
+            /*bottom: 0;*/
+            height: 100%;
+            width: 200px;
+            border-right: 1px solid #d1d1d1;
+            float: left;
+            overflow-y: scroll;
+        }
+
+        .editor-layout > .layout-cell {
+            margin: 3px 12px 6px 12px;
+        }
+
+        .layout-cell {
+            display: block;
+            height: 60px;
+            box-shadow: 0 1px 3px #777;
+            border-radius: 3px;
+            padding: 8px;
+            background-color: #fff;
+        }
+
+        .layout-cell.moving {
+            background-color: #eee;
+        }
+
+        .cell-touch {
+            height: 40px;
+            width: 40px;
+            background: #eee;
+            margin-top: 2px;
+        }
+
+        .editor-doc {
+            position: absolute;
+            top: 0;
+            left: 200px;
+            right: 0;
+            bottom: 0;
+            overflow-y: scroll;
+        }
+
+        .editor-doc > .doc-cell {
+            margin: 10px 15px 10px 15px;
+        }
+
+        .doc-cell > .doc-paragraph {
+            min-height: 20px;
+            line-height: 20px;
+            border: 1px dashed #aaa;
+        }
+
+        .editor-toolbar {
+            position: fixed;
+            bottom: 0;
+            height: 100px;
+            width: 800px;
+        }
+
+        .toolbar-back {
+            position: relative;
+            height: 100%;
+        }
+
+        .toolbar-back:before {
+            position: absolute;
+            content: '';
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.8);
+            filter: blur(5px);
+            -webkit-filter: blur(5px); /* Chrome, Opera */
+            -moz-filter: blur(5px);
+            -ms-filter: blur(5px);
+        }
+
+        .toolbar-fore {
+            position: absolute;
+            top: 0;
+            bottom: 10px;
+            left: 15px;
+            right: 15px;
+            padding: 10px 15px;
+            border-top: 1px solid #888;
+        }
+
+        .doc-paragraph span.s11 {
+            font-size: 11px;
+        }
+
+        .doc-paragraph span.s12 {
+            font-size: 11px;
+        }
+
+        .doc-paragraph span.red {
+            color: red;
+        }
+
+        .doc-paragraph span.blue {
+            color: blue;
+        }
+    </style>
+</head>
+<body>
+<div id="editor" class="editor toolbar-high">
+    <div class="editor-layout">
+        <div id="li1" class="layout-cell" draggable="true">
+            <div class="cell-touch"></div>
+        </div>
+        <div id="li2" class="layout-cell" draggable="true">
+            <div class="cell-touch">2</div>
+        </div>
+        <div id="li3" class="layout-cell" draggable="true">
+            <div class="cell-touch">3</div>
+        </div>
+        <div id="li4" class="layout-cell" draggable="true">
+            <div class="cell-touch">4</div>
+        </div>
+        <div id="li5" class="layout-cell" draggable="true">
+            <div class="cell-touch">5</div>
+        </div>
+        <div id="li6" class="layout-cell" draggable="true">
+            <div class="cell-touch">6</div>
+        </div>
+        <div id="li7" class="layout-cell" draggable="true">
+            <div class="cell-touch">7</div>
+        </div>
+        <div id="li8" class="layout-cell" draggable="true">
+            <div class="cell-touch">8</div>
+        </div>
+    </div>
+    <div class="editor-doc">
+        <div id="li1-bind" class="doc-cell doc-title">
+            <div class="doc-paragraph" contenteditable="true"></div>
+        </div>
+        <div id="li2-bind" class="doc-cell doc-description" contenteditable="true">
+            <div class="doc-paragraph">
+                <span class="s11 red">hahaha<b>hhhh<i>hjhkj</i></b></span>
+                <span class="s11 blue">hahaha<b>hhhh<i>hjhkj</i></b></span>
+                <span>ssss</span><span class="s12 red">tetetetete</span>
+            </div>
+        </div>
+        <div id="li3-bind" class="doc-cell doc-text">
+            <div class="doc-paragraph" contenteditable="true"><span class="s11 red">hahaha<b>hhhh<i>hjhkj</i></b></span><span
+                    class="s11 blue">hahaha<b>hhhh<i>hjhkj</i></b></span><span class="s12 red">tetetetete</span></div>
+        </div>
+        <div id="li4-bind" class="doc-cell doc-quote">
+            <div class="doc-paragraph" contenteditable="true">
+                <span class="s11 blue"> </span>
+            </div>
+        </div>
+        <div id="li5-bind" class="doc-cell doc-image">
+            <div class="doc-paragraph doc-description" contenteditable="true"></div>
+        </div>
+        <div id="li6-bind" class="doc-cell doc-video">
+            <div class="doc-paragraph doc-description" contenteditable="true"></div>
+        </div>
+        <div id="li7-bind" class="doc-cell doc-text">
+            <div class="doc-paragraph" contenteditable="true"></div>
+        </div>
+        <div id="li8-bind" class="doc-cell doc-text">
+            <div class="doc-paragraph" contenteditable="true"></div>
+        </div>
+    </div>
+    <div class="editor-toolbar">
+        <button class="bold-btn" type="button">Bold</button>
+        <button type="button">Italy</button>
+        <button type="button">Text</button>
+        <div id="li9" class="layout-cell" draggable="true">
+            1
+        </div>
+    </div>
+</div>
+</body>
+<script>
+    //test
+    const sel = window.getSelection()
+    const doc = document.querySelector('#li1-bind .doc-paragraph')
+    const boldBtn = document.querySelector('.editor-toolbar>.bold-btn')
+    const colorBtn = document.querySelector('.editor-toolbar>.color-btn')
+    var replace = [];
+    var range;
+
+
+    //    function testFor() {
+    //        let isBold = false
+    //        for (let i = 0; i < 5; i++) {
+    //            console.log('outer for')
+    //            for (let j = 0; j < 5; j++) {
+    //                console.log('inner for')
+    //                isBold = i * j > 10
+    //                console.log(i + ' ' + j)
+    //                if (isBold) {
+    //                    console.log('inner break')
+    //                    break
+    //                }
+    //            }
+    //            if(isBold){
+    //                console.log('outer break')
+    //                break
+    //            }
+    //        }
+    //        console.log('outside')
+    //    }
+
+    boldBtn.addEventListener('click', (e) => {
+        test(1);
+        defaultEvent(e)
+    })
+    //boldBtn.addEventListener('mouseup',(e)=>{console.log('mouseup');if(replace){sel.selectAllChildren(replace);doc.focus()}})
+
+    function test(type) {
+        range = sel.getRangeAt(0)
+        console.log('select')
+        let select = reformSelect(range)
+        console.log('fore')
+        let fore = reformForeSelect(range)
+        console.log('after')
+        let after = reformAfterSelect(range)
+        range.deleteContents()
+        let comm = range.commonAncestorContainer
+        console.log(comm)
+        if (range.commonAncestorContainer.nodeName == 'SPAN') {
+            range.selectNode(range.commonAncestorContainer)
+            range.deleteContents()
+        }
+        console.log(range)
+        if (type == 0) {
+            if (select instanceof DocumentFragment) {
+                let change = select.querySelectorAll('span')
+                for (let i = 0; i < change.length; i++) {
+                    change[i].classList.remove('red')
+                    change[i].classList.add('blue')
+                }
+            } else {
+                select.classList.remove('red')
+                select.classList.add('blue')
+            }
+        } else if (type == 1) {
+            let isBold = true
+            if (select instanceof DocumentFragment) {
+                let change = select.querySelectorAll('span')
+                for (let i = 0; i < change.length; i++) {
+                    for (let j = 0; j < change[i].childNodes.length; j++) {
+                        isBold = change[i].childNodes[j].nodeName == 'B'
+                        if (!isBold) {
+                            break
+                        }
+                    }
+                    if (!isBold) {
+                        break
+                    }
+                }
+                if (!isBold) {
+                    for (let i = 0; i < change.length; i++) {
+                        let inner = change[i].innerHTML
+                        console.log(inner)
+                        inner = inner.replace('<b>', '')
+                        inner = inner.replace('</b>', '')
+                        change[i].innerHTML = '<b>' + inner + '</b>'
+                    }
+                } else {
+                    for (let i = 0; i < change.length; i++) {
+                        let inner = change[i].innerHTML
+                        console.log(inner)
+                        inner = inner.replace('<b>', '')
+                        inner = inner.replace('</b>', '')
+                        change[i].innerHTML = inner
+                    }
+                }
+            } else {
+                for (let j = 0; j < select.childNodes.length; j++) {
+                    isBold = select.childNodes[j].nodeName == 'B'
+                    if (!isBold) {
+                        break
+                    }
+                }
+                if (!isBold) {
+                    let inner = select.innerHTML
+                    console.log(inner)
+                    inner = inner.replace('<b>', '')
+                    inner = inner.replace('</b>', '')
+                    select.innerHTML = '<b>' + inner + '</b>'
+                } else {
+                    let inner = select.innerHTML
+                    inner = inner.replace('<b>', '')
+                    inner = inner.replace('</b>', '')
+                    select.innerHTML = inner
+                }
+            }
+        }
+        range.insertNode(after)
+//        doc.appendChild(fore)
+        console.log('select in test')
+        replace = []
+        if (select instanceof DocumentFragment) {
+            for (let y = select.childNodes.length - 1; y >= 0; y--) {
+                replace[y] = select.childNodes[y]
+                console.log(y)
+                console.log(replace[y])
+                range.insertNode(replace[y])
+            }
+        } else {
+            replace[0] = select
+            range.insertNode(select)
+        }
+
+
+        range.insertNode(fore)
+//        doc.appendChild(select)
+//        doc.appendChild(after)
+        sel.selectAllChildren(replace[0])
+        if (replace[1]) {
+            sel.extend(replace[replace.length - 1], replace[replace.length - 1].childNodes.length)
+        }
+        return [fore, select, after]
+    }
+</script>
+<script>
+    const maineditor = document.getElementById('editor');
+    const editorLayout = maineditor.querySelector('.editor-layout')
+    const editorDoc = editor.querySelector('.editor-doc')
+    const body = document.querySelector('body')
+</script>
+<script>
+    //editor
+
+    editorDoc.addEventListener('selectstart', (e) => {
+        console.log(sel.toString())
+    })
+
+    editorDoc.addEventListener('select', (e) => {
+        console.log(e)
+    })
+
+    editorDoc.addEventListener('mousedown', (e) => {
+        console.log('down')
+        console.log(e)
+        console.log(sel.toString())
+    })
+
+    editorDoc.addEventListener('mousedown', (e) => {
+        console.log('up')
+        console.log(e)
+        console.log(sel.toString())
+    })
+
+
+    //forbid auto focus
+    editorDoc.firstElementChild.focus()
+
+    //click and focus
+    maineditor.querySelector('.editor-layout').addEventListener('click', function (e) {
+        console.log('click')
+        console.log(e)
+        let tmp = getParent(e.target, '.layout-cell', '.editor')
+        if (tmp != null) {
+            tmp = document.getElementById(tmp.id + '-bind')
+            if (tmp != undefined) {
+                editorDoc.scrollTop = tmp.offsetTop
+                tmp.querySelector('.doc-paragraph').focus()
+                console.log('focused')
+            }
+        }
+    })
+
+</script>
+<script>
+    //paragraph
+    editorDoc.addEventListener('keydown', function (e) {
+        console.log(e)
+        if (e.target.classList.contains('doc-paragraph')) {
+
+            //decrypted
+            //click enter will create a new line
+//            if (e.keyCode == 13) {
+//                let nxt = e.target.cloneNode(false)
+//                e.target.parentNode.insertBefore(nxt, e.target.nextSibling)
+//                nxt.focus()
+////                if (e.target.parentNode.nextElementSibling && e.target.parentNode.nextElementSibling.classList.contains('doc-cell')) {
+////                    console.log('next focus')
+////                    e.target.parentNode.nextElementSibling.querySelector('.doc-paragraph').focus()
+////                } else {
+////                    console.log('lost focus')
+////                    e.target = null
+////                }
+//                window.event ? window.event.returnValue = false : e.preventDefault();
+//            }
+
+            //click backspace
+            if (e.keyCode == 8) {
+                console.log(e.target.innerText)
+                if (!e.target.innerText) {
+                    console.log('it\'s empty')
+                    if (e.target != e.target.parentNode.firstElementChild) {
+                        console.log('it\'s not first')
+                        if (e.target.previousSibling && e.target.previousSibling.classList.contains('doc-paragraph')) {
+                            e.target.previousSibling.focus()
+                            sel.selectAllChildren(e.target.previousSibling)
+                            sel.collapseToEnd()
+                            e.target.parentNode.removeChild(e.target)
+                            window.event ? window.event.returnValue = false : e.preventDefault();
+                        }
+                    }
+                } else {
+                    if (sel.anchorOffset == 0) {
+                        let cur = sel.anchorNode
+                        let isFirst = true
+                        while (!cur.parentNode.classList.contains('doc-paragraph')) {
+                            isFirst = cur.parentNode.firstChild == cur
+                            if (!isFirst) {
+                                break
+                            }
+                            cur = cur.parentNode
+                        }
+                        if (isFirst) {
+                            if (e.target.previousSibling && e.target.previousSibling.classList.contains('doc-paragraph')) {
+                                e.target.previousSibling.innerHTML = e.target.previousSibling.innerHTML+e.target.innerHTML
+                                e.target.previousSibling.focus()
+                                sel.selectAllChildren(e.target.previousSibling)
+                                sel.collapseToEnd()
+                                e.target.parentNode.removeChild(e.target)
+                                window.event ? window.event.returnValue = false : e.preventDefault();
+                            }
+                        } else {
+                            window.event ? window.event.returnValue = false : e.preventDefault();
+                        }
+                    }
+                }
+            }
+        }
+        console.log(e)
+    })
+</script>
+<script>
+    //editor-tool
+    function reformSelect(range) {
+        let ele = document.createElement('span')
+        let cuts = range.cloneContents()
+        let parent = range.commonAncestorContainer
+        while (parent.nodeName != 'SPAN' && parent.nodeName != 'DIV') {
+            console.log('enter')
+            if (parent.nodeName == '#text') {
+
+            } else {
+                ele = document.createElement(parent.tagName)
+                ele.appendChild(cuts)
+                cuts = ele
+            }
+            parent = parent.parentNode
+        }
+        //in case of no span parent in #text
+        if (cuts.querySelector('span') || cuts.nodeName == 'SPAN') {
+            ele = cuts
+        } else {
+            ele = document.createElement('span')
+            if (parent.nodeName == 'SPAN') {
+                ele.className = parent.className
+            }
+            ele.appendChild(cuts)
+            console.log(parent.classList)
+        }
+//        if (parent.nodeName == 'SPAN') {
+//            ele = document.createElement('span')
+//            ele.className = parent.className
+//            ele.appendChild(cuts)
+//            console.log(parent.classList)
+//        } else if (parent.nodeName == 'DIV') {
+//            ele = cuts
+//        }
+        console.log(ele)
+        return ele
+    }
+
+    function reformForeSelect(range) {
+        let ele = document.createElement('span')
+        let fore = range.startContainer
+        while (fore.nodeName != 'SPAN' && fore.nodeName != 'DIV') {
+            fore = fore.parentNode
+        }
+        range.deleteContents()
+        range.setStart(fore, 0)//this one should only select node's inner,but it's not it select the node self
+        //range.setStartAfter(fore.previousSibling)
+        console.log(fore)
+        console.log(range.cloneContents())
+        if (fore.nodeName == 'SPAN') {
+            console.log('span')
+            console.log(fore.classList)
+            //ele=range.cloneContents()//so,i change there for fix
+            if (range.cloneContents().querySelector('span')) {
+                ele = range.cloneContents()
+            } else {
+                ele.appendChild(range.cloneContents())
+                ele.className = fore.className
+            }
+        } else {
+            if (range.cloneContents().querySelector('span') || range.cloneContents().nodeName == 'SPAN') {
+                ele = range.cloneContents()
+            } else {
+                ele.appendChild(range.cloneContents())
+            }
+
+        }
+        return ele
+    }
+
+    function reformAfterSelect(range) {
+        let ele = document.createElement('span')
+        let after = range.endContainer
+        while (after.nodeName != 'SPAN' && after.nodeName != 'DIV') {
+            after = after.parentNode
+            console.log(after)
+        }
+        range.deleteContents()
+        range.setEnd(after, after.childNodes.length)
+        console.log(after)
+        console.log(range.cloneContents())
+        if (after.nodeName == 'SPAN') {
+            console.log('after')
+            console.log(after.classList)
+            ele.className = after.className
+            ele.appendChild(range.cloneContents())
+        } else {
+            if (range.cloneContents().querySelector('span') || range.cloneContents().nodeName == 'SPAN') {
+                ele = range.cloneContents()
+            } else {
+                ele.appendChild(range.cloneContents())
+            }
+        }
+        console.log(ele)
+        return ele
+    }
+</script>
+<script>
+    function createLayoutPreview() {
+        let id = arguments[0]
+        let type = arguments[1]
+        let layout = document.createElement('div')
+        layout.id = 'li' + id
+        layout.classList.add('layout-cell')
+        layout.setAttribute('draggable', 'true')
+        layout.innerHTML = 'b'
+        let doc = document.createElement('div')
+        doc.id = 'li' + id + '-bind'
+        doc.classList.add('doc-cell')
+        doc.innerHTML = '<div class="doc-paragraph" contenteditable="true"></div>'
+        return [layout, doc]
+    }
+</script>
+<script>
+    //drag system in PC Web
+    const dragItem = {
+        drag: {},
+        from: {},
+        before: {},
+
+        to: {},
+        over: {},
+
+        bind: {},
+        bindOver: {},
+
+        position: undefined,
+        up: false
+    }
+
+    //init dragItem
+    maineditor.querySelector('.editor-layout').addEventListener('dragstart', function (e) {
+        dragItem.drag = getParent(e.target, '.layout-cell', '.editor-layout')
+        if (dragItem.drag == undefined) {
+            return
+        }
+        dragItem.from = dragItem.drag.parentNode
+        dragItem.before = dragItem.drag.nextSibling
+        dragItem.drag.classList.add('moving')
+        dragItem.bind = document.getElementById(dragItem.drag.id + '-bind')
+    })
+
+    //init dragItem
+    maineditor.querySelector('.editor-toolbar').addEventListener('dragstart', function (e) {
+        let tmp = createLayoutPreview(maineditor.querySelector('.editor-layout').childElementCount)
+        dragItem.drag = tmp[0]
+        if (dragItem.drag == undefined) {
+            return
+        }
+        dragItem.from = undefined
+        dragItem.drag.classList.add('moving')
+        dragItem.bind = tmp[1]
+    })
+
+    //dragging over
+    maineditor.querySelector('.editor-layout').addEventListener('dragover', function (e) {
+        let tmp = getParent(e.target, '.layout-cell', '.editor-layout')
+        if (dragItem.drag == tmp) {
+            return
+        }
+        dragItem.over = tmp
+        if (dragItem.over == undefined) {
+            dragItem.to = undefined
+            return
+        }
+        dragItem.to = dragItem.over.parentNode
+        dragItem.bindOver = document.getElementById(dragItem.over.id + '-bind')
+        if (!dragItem.position) {
+            dragItem.position = e.clientY;
+        }
+        if ((e.clientY - dragItem.position) > 0) {
+            dropAfter(dragItem.drag, dragItem.over)
+            dragItem.up = false
+            //the doc is set after drag
+            //dropAfter(dragItem.bind, dragItem.bindOver)
+        } else {
+            dropBefore(dragItem.drag, dragItem.over)
+            dragItem.up = true
+            //the doc is set after drag
+            //dropBefore(dragItem.bind, dragItem.bindOver)
+        }
+        if (dragItem.bind) {
+            editorDoc.scrollTop = dragItem.bind.offsetTop
+        }
+        dragItem.position = e.clientY;
+    })
+
+    maineditor.addEventListener('dragend', function (e) {
+        dragItem.drag.classList.remove('moving')
+        if (!dragItem.to) {
+            maineditor.querySelector('.editor-layout').removeChild(dragItem.drag)
+            if (dragItem.from) {
+                if (dragItem.drag.before) {
+                    dragItem.from.insertBefore(dragItem.drag, dragItem.before)
+                } else {
+                    dragItem.from.appendChild(dragItem.drag)
+                }
+            }
+        } else {
+            if (dragItem.from) {
+                if (dragItem.up) {
+                    dropBefore(dragItem.bind, dragItem.bindOver)
+                } else {
+                    dropAfter(dragItem.bind, dragItem.bindOver)
+                }
+            } else {
+                if (dragItem.up) {
+                    dropBefore(dragItem.bind, dragItem.bindOver)
+                } else {
+                    dropAfter(dragItem.bind, dragItem.bindOver)
+                }
+            }
+        }
+    })
+</script>
+<script>
+    //init touchItem
+    var touchItem = {
+        copy: undefined,
+        origin: {},
+        before: {},
+
+        over: {},
+        to: {},
+
+        position: undefined,
+        up: false
+    }
+
+    maineditor.querySelector('.editor-layout').addEventListener('touchstart', function (e) {
+        console.log('start')
+        let touch = getParent(e.target, '.layout-cell>.cell-touch', '.editor-layout')
+        if (touch) {
+            let parent = getParent(e.target, '.layout-cell', '.editor-layout')
+            if (parent == undefined) {
+                return
+            } else {
+                touchItem.origin = parent
+                touchItem.before = parent.nextSibling
+                touchItem.copy = parent.cloneNode(true)
+                parent.classList.add('moving')
+                console.log(touchItem.copy)
+//                maineditor.appendChild(touchItem.copy)
+                body.appendChild(touchItem.copy)
+                touchItem.copy.style.position = 'absolute'
+                touchItem.copy.style.height = parent.clientHeight + 'px'
+                touchItem.copy.style.width = parent.clientWidth + 'px'
+//                touchItem.copy.style.left = (e.touches[0].clientX-maineditor.clientX+parent.style.marginLeft)+'px'
+//                touchItem.copy.style.top = (e.touches[0].clientY-maineditor.clientY+parent.style.marginTop)+'px'
+                touchItem.copy.style.left = (e.touches[0].clientX + 20) + 'px'
+                touchItem.copy.style.top = (e.touches[0].clientY - touchItem.copy.clientHeight / 2) + 'px'
+                touchItem.position = e.touches[0].clientY
+                document.addEventListener("touchmove", defaultEvent, false);
+                return
+            }
+        }
+    })
+
+    maineditor.querySelector('.editor-layout').addEventListener('touchmove', function (e) {
+        console.log('move')
+        let touchPoint = e.touches[0]
+        let under = document.elementFromPoint(touchPoint.clientX, touchPoint.clientY);
+        if (touchItem.copy) {
+            touchItem.copy.style.left = (touchPoint.clientX + 20) + 'px'
+            touchItem.copy.style.top = (touchPoint.clientY - touchItem.copy.clientHeight / 2) + 'px'
+            if (touchPoint.clientY <= 0) {
+                editorLayout.scrollTop = editorLayout.scrollTop - 69;
+            }
+            under = getParent(under, '.editor-layout>.layout-cell', '.editor-layout')
+            console.log(under)
+            if (touchItem.origin != under) {
+                touchItem.over = under
+                if (under) {
+                    if (touchPoint.clientY - touchItem.position > 0) {
+                        dropAfter(touchItem.origin, under)
+                        touchItem.up = false
+                    } else {
+                        dropBefore(touchItem.origin, under)
+                        touchItem.up = true
+                    }
+                    touchItem.position = touchPoint.clientY
+                }
+            }
+        }
+    })
+
+    maineditor.querySelector('.editor-layout').addEventListener('touchend', function (e) {
+        console.log('end')
+        console.log(e)
+        handleEnd()
+    })
+
+    maineditor.querySelector('.editor-layout').addEventListener('touchcancel', function (e) {
+        console.log('cancel')
+        console.log(e)
+        handleEnd()
+    })
+
+    function handleEnd() {
+        document.removeEventListener("touchmove", defaultEvent, false)
+        console.log(touchItem.copy)
+        if (touchItem.copy) {
+//            maineditor.removeChild(touchItem.copy)
+            body.removeChild(touchItem.copy)
+            touchItem.origin.classList.remove('moving')
+            if (touchItem.over) {
+                if (touchItem.up) {
+                    dropBefore(getBindElement(touchItem.origin), getBindElement(touchItem.over))
+                } else {
+                    dropAfter(getBindElement(touchItem.origin), getBindElement(touchItem.over))
+                }
+            } else {
+                dropBefore(touchItem.origin, touchItem.before)
+            }
+            touchItem.copy = undefined
+        }
+    }
+
+    function defaultEvent(e) {
+        window.event ? window.event.returnValue = false : e.preventDefault();
+    }
+
+    function getBindElement(e) {
+        return document.getElementById(e.id + '-bind')
+    }
+</script>
+<script>
+    //util
+    function getParent(target, targetNode, endNode) {
+        var list = document.querySelectorAll(targetNode)
+        var end
+        if (endNode instanceof Node) {
+            end = endNode
+        } else if ((typeof endNode == 'string') && endNode.constructor == String) {
+            end = document.querySelectorAll(endNode)
+        } else {
+            throw new Error('getParent endNode must be Node Type or String Type')
+            return undefined
+        }
+        var found;
+        if (target instanceof Node) {
+            while (!found) {
+                found = list.indexOf(target) >= 0
+                if (target == undefined) {
+                    return undefined
+                } else if (end.indexOf(target) >= 0) {
+                    return undefined
+                } else if (target.nodeName == "BODY") {
+                    return undefined
+                }
+                if (!found) {
+                    target = target.parentNode
+                }
+            }
+        } else {
+            throw new Error('getParent target must be a Node type')
+        }
+
+        return target
+
+    }
+
+    NodeList.prototype.indexOf = function (object) {
+        for (let i = 0; i < this.length; i++) {
+            if (object == this[i]) {
+                return i
+            }
+        }
+        return -1
+    }
+
+    function dropBefore(d, e) {
+        e.parentNode.insertBefore(d, e)
+    }
+    function dropAfter(d, e) {
+        e.parentNode.insertBefore(d, e.nextSibling)
+    }
+
+    function dropRemove(d, e) {
+        e.parentNode.removeChild(d)
+    }
+
+    function judgeParagraph(node) {
+        if (node instanceof DocumentFragment) {
+            for (let i = 0; i < node.childNodes.length; i++) {
+                if (!node.childNodes[i].innerText) {
+                    node.removeChild(node.childNodes[i])
+                }
+            }
+        } else {
+            if (node.innerText) {
+
+            }
+        }
+    }
+
+</script>
+</html>

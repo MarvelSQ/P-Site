@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+    <link rel="shortcut icon" href="img/logo-20*17.png">
+    <style>
+        html, body, p {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica Neue", serif;
+        }
+
+        @media screen and (max-width: 532px) {
+            .detail-head {
+                height: 200px;
+            }
+
+            .detail-head:after {
+                border-width: 20px 0 75px 100vw;
+            }
+
+            .detail-content-wrap {
+                top: 155px;
+            }
+
+            .detail-content {
+                margin-left: 16px;
+                margin-right: 16px;
+            }
+
+            .detail-content-title{
+                width: 70%;
+            }
+
+            .detail-content-description{
+                width: 85%;
+            }
+        }
+
+        @media screen and (min-width: 532px) {
+            .detail-head {
+                height: 400px;
+            }
+
+            .detail-head:after {
+                border-width: 20px 0 125px 100vw;
+            }
+
+            .detail-content-wrap {
+                top: 325px;
+            }
+
+            .detail-content {
+                width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .detail-content-title{
+                width: 340px;
+            }
+
+            .detail-content-description{
+                width: 400px;
+            }
+        }
+
+        .detail-head {
+            position: absolute;
+            z-index: 1;
+            width: 100%;
+            top: 0;
+            background-size: cover;
+            background-position: bottom;
+        }
+
+        .detail-head:after {
+            display: block;
+            content: '';
+            border-style: solid;
+            border-color: transparent transparent #fff transparent;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .detail-content-wrap {
+            position: absolute;
+            z-index: 99;
+            width: 100%;
+        }
+
+        .detail-content {
+            display: flex;
+            display: -webkit-flex; /* Safari */
+            flex-direction: column;
+            align-items:center;
+            justify-content: inherit;
+            min-height: 900px;
+        }
+
+        .detail-content-title {
+            align-self:flex-end;
+            text-align: end;
+            word-wrap: break-word;
+            overflow-y: hidden;
+            line-height: 40px;
+            max-height: 80px;
+        }
+
+        .detail-content-description {
+            align-self:flex-end;
+            text-align: end;
+            word-wrap: break-word;
+            word-break: break-all;
+            color: #aaa;
+            font-weight: 300;
+        }
+
+        .detail-content-text {
+            align-self: flex-start;
+            word-wrap: break-word;
+            word-break: break-all;
+            color: #333;
+            font-size: 16px;
+            font-weight: 400;
+            text-indent:2em
+        }
+
+        .detail-content-text {
+            word-wrap: break-word;
+            word-break: break-all;
+            color: #333;
+            font-size: 16px;
+            font-weight: 400;
+            text-indent:2em
+        }
+
+        .detail-content>.detail-content-description{
+            margin-bottom: 20px;
+        }
+
+        .detail-content>.detail-content-text{
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="detail-head bg-top" style="background-image: url('img/back.png')"></div>
+<div class="detail-content-wrap">
+    <div class="detail-content">
+        <h1 class="detail-content-title">snqng.com-个人站上线</h1>
+        <p class="detail-content-description">p-site 第一步</p>
+        <p class="detail-content-text">暂时使用了新设计的logo</p>
+        <img class="detail-content-img" src="img/logo-160*136.png" srcset="img/logo-160*136.png 1x,img/logo-320*272.png 2x">
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<!--suppress ALL -->
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>编辑器</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+    <link rel="shortcut icon" href="img/logo-20*17.png">
+    <style>
+        html, body, ul, p, pre, textarea {
+            margin: 0;
+            padding: 0;
+            font-family: "Helvetica Neue", serif;
+            border: none;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        ul, li {
+            list-style: none;
+        }
+
+        .main {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            display: -webkit-flex;
+        }
+
+        @media screen and (max-width: 532px) {
+            .side-menu {
+                display: none;
+            }
+
+        }
+
+        .side-menu {
+            width: 200px;
+            height: 100%;
+            overflow: scroll;
+            flex-shrink: 0;
+        }
+
+        .side-menu > li {
+            height: 50px;
+            width: 100%;
+        }
+
+        .side-menu > li:nth-child(2n-1) {
+            background-color: #fff;
+        }
+
+        .side-menu > li:nth-child(2n) {
+            background-color: #eee;
+        }
+
+        .editor {
+            flex-grow: 1;
+            background-color: #ddd;
+            min-width: 500px;
+            overflow: scroll;
+        }
+    </style>
+    <style>
+        .editor-content {
+            display: flex;
+            display: -webkit-flex;
+            margin-left: auto;
+            margin-right: auto;
+            height: 100%;
+            width: 500px;
+            background-color: #fff;
+        }
+
+        .editor-layout {
+            width: 100px;
+        }
+
+        .editor-layout > li.moving {
+            background-color: bisque;
+        }
+
+        .editor-doc {
+            flex-grow: 1;
+            background-color: aqua;
+            height: 100%;
+            overflow-y: scroll;
+        }
+
+        .editor-toolbar {
+            position: fixed;
+            height: 50px;
+            width: 500px;
+            bottom: 0;
+            background-color: #f00;
+        }
+
+        .doc-cell {
+            height: 200px;
+            background-color: #eeeeee;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+<div class="main">
+    <ul class="side-menu">
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+        <li></li>
+    </ul>
+    <div class="editor">
+        <div class="editor-content">
+            <ul class="editor-layout" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <li id="li1" draggable="true"><p>1</p></li>
+                <li id="li2" draggable="true"><p>2</p></li>
+                <li id="li3" draggable="true"><p>3</p></li>
+                <li id="li4" draggable="true"><p>4</p></li>
+                <li id="li5" draggable="true"><p>5</p></li>
+                <li id="li6" draggable="true"><p>6</p></li>
+                <li id="li7" draggable="true"><p>7</p></li>
+                <li id="li8" draggable="true"><p>8</p></li>
+            </ul>
+            <div class="editor-doc">
+                <div class="doc-cell" id="li1-bind">1</div>
+                <div class="doc-cell" id="li2-bind">2</div>
+                <div class="doc-cell" id="li3-bind">3</div>
+                <div class="doc-cell" id="li4-bind">4</div>
+                <div class="doc-cell" id="li5-bind">5</div>
+                <div class="doc-cell" id="li6-bind">6</div>
+                <div class="doc-cell" id="li7-bind">7</div>
+                <div class="doc-cell" id="li8-bind">8</div>
+            </div>
+            <div class="editor-toolbar">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function test(e) {
+        console.log(e)
+    }
+    const dragItem = {
+        drag: {},
+        over: {},
+        bind: {},
+        bindOver:{},
+        position: undefined
+    }
+    const layout = document.querySelector('.editor .editor-layout');
+    const doc = document.querySelector('.editor .editor-doc')
+//    const docInput = document.querySelector('.editor .editor-doc>textarea')
+//    const docText = document.querySelector('.editor .editor-doc>pre')
+    var userSelection, rangeObject;
+//    docText.addEventListener('keydown', function (e) {
+//        console.log(e)
+//    })
+//    docText.addEventListener('select', function (e) {
+//        console.log(e)
+//    })
+    /*docInput.addEventListener('select', function (e) {
+        console.log(e)
+        if (window.getSelection) { //现代浏览器
+            userSelection = window.getSelection();
+        } else if (document.selection) { //IE浏览器 考虑到Opera，应该放在后面
+            userSelection = document.selection.createRange();
+        }
+        rangeObject = userSelection;
+        if (userSelection.getRangeAt) {
+            //现代浏览器
+            rangeObject = userSelection.getRangeAt(0);
+        }
+        var rangeIndex = getRangeIndex(userSelection);
+        selectionStart = rangeIndex[0];
+        selectionEnd = rangeIndex[1];
+        docInput.value = docInput.value.substring(0, selectionStart)
+            + '<b>' + docInput.value.substring(selectionStart, selectionEnd)
+            + '</b>' + docInput.value.substring(selectionEnd);
+    })*/
+
+    var getRangeIndex = function (selectionObject) {
+        if (window.getSelection)
+            return [docInput.selectionStart, docInput.selectionEnd];
+        else { // 较老版本Safari!
+            var range = document.selection.createRange();             //对选择的文字create Range
+            // var selectText          = range.text;                                //选中的文字
+            var selectTextLength = range.text.length;                            //选中文字长度
+            textarea.select();                                                      //textarea全选
+            //StartToStart、StartToEnd、EndToStart、EndToEnd
+            range.setEndPoint("StartToStart", document.selection.createRange());    //指针移动到选中文字开始
+            var selectTextPosition = range.text.length;                            //选中文字的结束位置
+            range.collapse(false);                                                  //将插入点移动到当前范围的开始
+            range.moveEnd("character", -selectTextLength);   //更改范围的结束位置，减去长度，字符开始位置，character不能改
+            range.moveEnd("character", selectTextLength);   //再更改范围的结束位置，到字符结束位置
+            range.select();                                                         //然后选中字符
+
+            //返回字符的开始和结束位置
+            return [selectTextPosition - selectTextLength, selectTextPosition];
+        }
+    }
+
+    //    document.addEventListener('click',function (e) {
+    //        if(e.target == doc){
+    //            console.log('docclicked')
+    //            docInput.focus()
+    //        }else {
+    //            docInput.blur()
+    //            console.log('doc unclick')
+    //        }
+    //        console.log(e)
+    //    })
+//    docInput.addEventListener('keyup', function (e) {
+//        docText.innerHTML = docInput.value
+//    })
+    //    document.addEventListener('keyup',function (e) {
+    //        if(doc.contentEditable){
+    //            if(doc.childNodes.indexOf())
+    //            doc.appendChild(document.createElement('input'))
+    //        }
+    //    })
+    doc.addEventListener('keyup', function (e) {
+        console.log(e)
+    })
+    var curevent;
+    document.querySelectorAll('.editor .editor-layout>li').forEach(function (e) {
+        e.addEventListener('drag', function (e) {
+
+        })
+        e.addEventListener('dragstart', function (e) {
+            this.classList.add('moving')
+            dragItem.drag = this
+            var strId = this.id+'-bind'
+            console.log(strId)
+            dragItem.bind = document.getElementById(strId)
+        })
+        e.addEventListener('dragover', function (e) {
+            dragItem.over = this
+            dragItem.bindOver = document.getElementById(this.id+'-bind')
+            if (!dragItem.position) {
+                dragItem.position = e.clientY;
+            }
+            if ((e.clientY - dragItem.position) > 0) {
+                dropAfter(dragItem.drag, this)
+                dropAfter(dragItem.bind,dragItem.bindOver)
+            } else {
+                dropBefore(dragItem.drag, this)
+                dropBefore(dragItem.bind,dragItem.bindOver)
+            }
+            dragItem.position = e.clientY;
+        })
+        e.addEventListener('click', () => {
+
+        })
+        e.addEventListener('dragend', function (e) {
+            this.classList.remove('moving')
+        })
+        e.addEventListener("touchstart", function (e) {
+            console.log(e);
+            var touches = e.touches[0];
+            oW = touches.clientX - e.offsetLeft;
+            oH = touches.clientY - e.offsetTop;
+            //阻止页面的滑动默认事件
+            document.addEventListener("touchmove", defaultEvent, false);
+        }, false)
+        e.addEventListener("touchmove", function (e) {
+            var touches = e.touches[0];
+            var oLeft = touches.clientX - oW;
+            var oTop = touches.clientY - oH;
+            if (oLeft < 0) {
+                oLeft = 0;
+            } else if (oLeft > document.documentElement.clientWidth - e.offsetWidth) {
+                oLeft = (document.documentElement.clientWidth - e.offsetWidth);
+            }
+            block.style.left = oLeft + "px";
+            block.style.top = oTop + "px";
+        }, false);
+
+        e.addEventListener("touchend", function () {
+            document.removeEventListener("touchmove", defaultEvent, false);
+        }, false);
+    })
+    function defaultEvent(e) {
+        e.preventDefault();
+    }
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        curevent = ev
+        ev.dataTransfer.setData("Text", ev.target.id);
+    }
+
+    function drop(ev) {
+        ev.preventDefault();
+        var data = ev.dataTransfer.getData("Text");
+        console.log(data)
+//        dropAfter(document.getElementById(data),ev.target.parentNode)
+//        layout.appendChild();
+    }
+
+    function dropBefore(d, e) {
+        e.parentNode.insertBefore(d, e)
+    }
+    function dropAfter(d, e) {
+        e.parentNode.insertBefore(d, e.nextSibling)
+    }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SQ-Hello,World!</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no"/>
+    <link rel="shortcut icon" href="img/logo-20*17.png">
+    <script src="js/util.js"></script>
+    <link href="css/layout.css" type="text/css" rel="stylesheet">
+    <style>
+        body {
+            background-image: url("img/alien.png");
+            background-size: cover;
+        }
+        .container > .content {
+            line-height: 44px;
+            font-size: 40px;
+        }
+
+        .content > div > a {
+            color: #a4a4a4;
+            font-size: 40px;
+        }
+
+        .content > div > a:hover {
+            color: #FE3824;
+            text-decoration: underline;
+        }
+
+        .container>.tip{
+            left: 50%;
+            width: 500px;
+            margin-left: -250px;
+        }
+
+        /*.content>div:after{*/
+        /*content: '';*/
+        /*width: 100%;*/
+        /*display: inline-block;*/
+        /*}*/
+
+        /*.content>div:hover{*/
+        /*color: #FE3824;*/
+        /*text-decoration:underline;*/
+        /*}*/
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <nav class="nav">
+        <img src="img/icon_v2-240*117.png" srcset="img/icon_v2-480*234.png 2x,img/icon_v2-720*351.png 3x">
+    </nav>
+    <div class="content">
+        <div class="cell4"><a class="split" href="blog.html"><span>B</span><span>L</span><span>O</span><span>G</span></a></div>
+        <div class="cell4"><a class="split"><span>R</span><span>E</span><span>P</span><span>O</span></a></div>
+        <!--<div style="text-align: justify;text-align-last:justify;-webkit-text-align-last:justify;word-break: break-all;">h h h h h h</div>-->
+        <div class="cell4"><a class="split"><span>G</span><span>R</span><span>O</span><span>W</span></a></div>
+        <!--<div><a href="editor-beta.html"><span>博</span><span>客</span></a></div>-->
+        <!--<div><a><span>代</span><span>码</span></a></div>-->
+        <!--<div><a><span>成</span><span>长</span></a></div>-->
+    </div>
+    <div class="tip">
+        <div class="cell4">
+            E-mail:
+            <a class="email-link" href="mailto:sun1993hlj@hotmail.com">sun1993hlj@hotmail.com</a>
+        </div>
+        <div class="cell4">
+        language:
+        <select onchange="window.location=this.value;">
+            <option value="index.html?lang=en" selected>English</option>
+            <option value="index.html?lang=cn">简体中文</option>
+        </select>
+        </div>
+    </div>
+</div>
+
+<!--<script>-->
+
+<!--var nav = document.querySelector('nav.nav')-->
+<!--var content = document.querySelector('div.content')-->
+<!--console.log(nav)-->
+<!--document.addEventListener('scroll', function (e) {-->
+<!--//        console.log(e)-->
+<!--//        console.log(document.body.scrollTop)-->
+<!--if (document.body.scrollTop > 212) {-->
+<!--nav.classList.add('fix')-->
+<!--} else {-->
+<!--nav.classList.remove('fix')-->
+<!--}-->
+<!--})-->
+
+<!--if (window.fetch) {-->
+<!--fetch('https://api.github.com/users/marvelsq/repos').then(function (res) {-->
+<!--console.log(res)-->
+<!--return res.json()-->
+<!--}).then((res)=>{-->
+<!--if (res instanceof Array) {-->
+<!--console.log(res)-->
+<!--addDataToContent(res)-->
+<!--}-->
+<!--})-->
+<!--} else {-->
+<!--addMissingFetch()-->
+<!--}-->
+
+<!--function addMissingFetch() {-->
+<!--content.innerHTML = '<div><h3>Missing Fetching Function</h3></div>'-->
+<!--}-->
+
+<!--function addDataToContent(array) {-->
+<!--var str = ''-->
+<!--for (var i = 0; i < array.length; i++) {-->
+<!--console.log(array[i].name)-->
+<!--str += '<div><h2>'-->
+<!--+ array[i].name + '</h2><p>'-->
+<!--+ array[i].created_at + '</p></div>'-->
+<!--}-->
+<!--content.innerHTML = str-->
+<!--}-->
+
+<!--</script>-->
+
+</body>
+</html>
